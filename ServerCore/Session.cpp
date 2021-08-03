@@ -215,7 +215,7 @@ void Session::ProcessConnect()
 	GetService()->AddSession(GetSessionRef());
 
 	// 컨텐츠 코드에서 재정의
-	OnConnected(); //글로벌 게임 세션 매니저에 인설트함.
+	OnConnected();
 
 	// 수신 등록
 	RegisterRecv();
