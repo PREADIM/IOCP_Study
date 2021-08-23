@@ -12,6 +12,10 @@
 #include "Room.h"
 #include "Player.h"
 #include "DBConnectionPool.h"
+#include "DBBind.h"
+#include "XmlParser.h"
+#include "DBSynchronizer.h"
+#include "GenProcedures.h"
 
 enum
 {
@@ -37,76 +41,44 @@ void DoWorkerJob(ServerServiceRef& service)
 
 int main()
 {
-	//
-
 	ASSERT_CRASH(GDBConnectionPool->Connect(1, L"Driver={SQL Server Native Client 11.0};Server=(localdb)\\MSSQLLocalDB;Database=ServerDb;Trusted_Connection=Yes;"));
 
-	// Create Table
-	{
-		auto query = L"									\
-			DROP TABLE IF EXISTS [dbo].[Gold];			\
-			CREATE TABLE [dbo].[Gold]					\
-			(											\
-				[id] INT NOT NULL PRIMARY KEY IDENTITY, \
-				[gold] INT NULL							\
-			);";
+	DBConnection* dbConn = GDBConnectionPool->Pop();
+	DBSynchronizer dbSync(*dbConn);
+	dbSync.Synchronize(L"GameDB.xml");
 
-		DBConnection* dbConn = GDBConnectionPool->Pop();
-		ASSERT_CRASH(dbConn->Execute(query));
-		GDBConnectionPool->Push(dbConn);
+	{
+		WCHAR name[] = L"Rookiss";
+
+		SP::InsertGold insertGold(*dbConn);
+		insertGold.In_Gold(100);
+		insertGold.In_Name(name);
+		insertGold.In_CreateDate(TIMESTAMP_STRUCT{ 2020, 6, 8 });
+		insertGold.Execute();
 	}
 
-	// Add Data
-	for (int32 i = 0; i < 3; i++)
 	{
-		DBConnection* dbConn = GDBConnectionPool->Pop();
-		// 기존에 바인딩 된 정보 날림
-		dbConn->Unbind();
+		SP::GetGold getGold(*dbConn);
+		getGold.In_Gold(100);
 
-		// 넘길 인자 바인딩
-		int32 gold = 100;
-		SQLLEN len = 0;
+		int32 id = 0;
+		int32 gold = 0;
+		WCHAR name[100];
+		TIMESTAMP_STRUCT date;
 
-		// 넘길 인자 바인딩
-		ASSERT_CRASH(dbConn->BindParam(1, SQL_C_LONG, SQL_INTEGER, sizeof(gold), &gold, &len));
+		getGold.Out_Id(OUT id);
+		getGold.Out_Gold(OUT gold);
+		getGold.Out_Name(OUT name);
+		getGold.Out_CreateDate(OUT date);
 
-		// SQL 실행
-		ASSERT_CRASH(dbConn->Execute(L"INSERT INTO [dbo].[Gold]([gold]) VALUES(?)"));
+		getGold.Execute();
 
-		GDBConnectionPool->Push(dbConn);
-	}
-
-	// Read
-	{
-		DBConnection* dbConn = GDBConnectionPool->Pop();
-		// 기존에 바인딩 된 정보 날림
-		dbConn->Unbind();
-
-		int32 gold = 100;
-		SQLLEN len = 0;
-		// 넘길 인자 바인딩
-		ASSERT_CRASH(dbConn->BindParam(1, SQL_C_LONG, SQL_INTEGER, sizeof(gold), &gold, &len));
-
-		int32 outId = 0;
-		SQLLEN outIdLen = 0;
-		ASSERT_CRASH(dbConn->BindCol(1, SQL_C_LONG, sizeof(outId), &outId, &outIdLen));
-
-		int32 outGold = 0;
-		SQLLEN outGoldLen = 0;
-		ASSERT_CRASH(dbConn->BindCol(2, SQL_C_LONG, sizeof(outGold), &outGold, &outGoldLen));
-
-		// SQL 실행
-		ASSERT_CRASH(dbConn->Execute(L"SELECT id, gold FROM [dbo].[Gold] WHERE gold = (?)"));
-
-		while (dbConn->Fetch())
+		while (getGold.Fetch())
 		{
-			cout << "Id: " << outId << " Gold : " << outGold << endl;
+			GConsoleLogger->WriteStdOut(Color::BLUE,
+				L"ID[%d] Gold[%d] Name[%s]\n", id, gold, name);
 		}
-
-		GDBConnectionPool->Push(dbConn);
 	}
-
-	//
 
 	ClientPacketHandler::Init();
 
