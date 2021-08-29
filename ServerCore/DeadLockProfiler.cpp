@@ -1,20 +1,14 @@
 #include "pch.h"
 #include "DeadLockProfiler.h"
 
-
-/*--------------------
-	DeadLockProfiler
----------------------*/
-
 void DeadLockProfiler::PushLock(const char* name)
 {
-	LockGuard guard(_lock);
+	LockGuard gaurd(_lock);
 
-	// 아이디를 찾거나 발급한다.
 	int32 lockId = 0;
 
 	auto findIt = _nameToId.find(name);
-	if (findIt == _nameToId.end())
+	if (findIt == _nameToId.end()) //없다면
 	{
 		lockId = static_cast<int32>(_nameToId.size());
 		_nameToId[name] = lockId;
@@ -25,37 +19,31 @@ void DeadLockProfiler::PushLock(const char* name)
 		lockId = findIt->second;
 	}
 
-	// 잡고 있는 락이 있었다면
-	if (LLockStack.empty() == false)
+
+	if (TL_LockStack.empty() == false) // 비어있지않다면
 	{
-		// 기존에 발견되지 않은 케이스라면 데드락 여부 다시 확인한다.
-		const int32 prevId = LLockStack.top();
-		if (lockId != prevId)
+		const int32 prevId = TL_LockStack.top(); // 가장 최근것 꺼내옴.
+		if (lockId != prevId) //현재 lockId랑 가장 최근에 저장된 Id가 다를경우.
 		{
 			set<int32>& history = _lockHistory[prevId];
-			if (history.find(lockId) == history.end())
+			if (history.find(lockId) == history.end()) //없으면
 			{
 				history.insert(lockId);
 				CheckCycle();
 			}
 		}
 	}
-
-	LLockStack.push(lockId);
+	TL_LockStack.push(lockId);		
 }
 
 void DeadLockProfiler::PopLock(const char* name)
 {
-	LockGuard guard(_lock);
-
-	if (LLockStack.empty())
-		CRASH("MULTIPLE_UNLOCK");
+	ASSERT_CRASH(TL_LockStack.empty());
 
 	int32 lockId = _nameToId[name];
-	if (LLockStack.top() != lockId)
-		CRASH("INVALID_UNLOCK");
+	ASSERT_CRASH(lockId == TL_LockStack.top()); //가장 최근에 넣은 Id가 아닐경우 크래시
 
-	LLockStack.pop();
+	TL_LockStack.pop();
 }
 
 void DeadLockProfiler::CheckCycle()
@@ -66,62 +54,65 @@ void DeadLockProfiler::CheckCycle()
 	_finished = vector<bool>(lockCount, false);
 	_parent = vector<int32>(lockCount, -1);
 
-	for (int32 lockId = 0; lockId < lockCount; lockId++)
-		Dfs(lockId);
+	for (int32 i = 0; i < lockCount; i++)
+	{
+		DFS(i);
+	}
 
-	// 연산이 끝났으면 정리한다.
 	_discoveredOrder.clear();
 	_finished.clear();
 	_parent.clear();
+
 }
 
-void DeadLockProfiler::Dfs(int32 here)
+void DeadLockProfiler::DFS(int32 now)
 {
-	if (_discoveredOrder[here] != -1)
+	if (_discoveredOrder[now] != -1) // -1이 아니면 방문한 기록이 있다.
 		return;
 
-	_discoveredOrder[here] = _discoveredCount++;
+	// _discoveredOrder[now]가 -1인 경우. 한번도 방문을 하지않은 경우.
+	_discoveredOrder[now] = _discoveredCount++; //해당 카운트 저장
 
-	// 모든 인접한 정점을 순회한다.
-	auto findIt = _lockHistory.find(here);
-	if (findIt == _lockHistory.end())
+	auto findId = _lockHistory.find(now); //[now]의 연대기를 확인. 한마디로 now다음에 들어온 락을 체크
+	if (findId == _lockHistory.end()) //now의 다음에 lock이 없다면,
 	{
-		_finished[here] = true;
+		_finished[now] = true; // 방문 끝
 		return;
 	}
 
-	set<int32>& nextSet = findIt->second;
-	for (int32 there : nextSet)
+	set<int32>& nextlock = findId->second;
+	for (auto nextLockId : nextlock)
 	{
-		// 아직 방문한 적이 없다면 방문한다.
-		if (_discoveredOrder[there] == -1)
+		if (_discoveredOrder[nextLockId] == -1) // -1이라는 뜻은 한번도 방문하지 않았기때문에 데드락이 아니다.
 		{
-			_parent[there] = here;
-			Dfs(there);
+			_parent[nextLockId] = now; // [nextLock]의 부모는 [now] 라는 뜻.
+			DFS(nextLockId);
 			continue;
 		}
+		
+		if (_discoveredOrder[nextLockId] > _discoveredOrder[now])
+			continue; // [nextLock]의 _discoveredCount가 [now]보다 크다면?
+					  // 지극히 정상이다. (순방향 간선)
 
-		// here가 there보다 먼저 발견되었다면, there는 here의 후손이다. (순방향 간선)
-		if (_discoveredOrder[here] < _discoveredOrder[there])
-			continue;
-
-		// 순방향이 아니고, Dfs(there)가 아직 종료하지 않았다면, there는 here의 선조이다. (역방향 간선)
-		if (_finished[there] == false)
+		if (_finished[nextLockId] == false) // 순방향 간선도 아니고 심지어 _finished도 false라면
 		{
-			printf("%s -> %s\n", _idToName[here], _idToName[there]);
+			printf("%s -> %s\n", _idToName[now], _idToName[nextLockId]);
 
-			int32 now = here;
+			int32 Id = now; // _parent[now]의 부모 lockId를 받아서 nextLock과 일치하는지 찾아낸다.
 			while (true)
 			{
-				printf("%s -> %s\n", _idToName[_parent[now]], _idToName[now]);
-				now = _parent[now];
-				if (now == there)
-					break;
+				printf("%s -> %s\n", _idToName[_parent[Id]], _idToName[Id]);
+				Id = _parent[Id];
+				if (Id == nextLockId)
+					break; // 찾음.
 			}
 
 			CRASH("DEADLOCK_DETECTED");
 		}
+
 	}
 
-	_finished[here] = true;
+
+	_finished[now] = true; // 아무일도 없으면 끝이다.
+
 }

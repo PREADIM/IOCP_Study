@@ -2,16 +2,9 @@
 #include "ThreadManager.h"
 #include "CoreTLS.h"
 #include "CoreGlobal.h"
-#include "GlobalQueue.h"
-
-/*------------------
-	ThreadManager
--------------------*/
 
 ThreadManager::ThreadManager()
 {
-	// Main Thread
-	InitTLS();
 }
 
 ThreadManager::~ThreadManager()
@@ -19,58 +12,34 @@ ThreadManager::~ThreadManager()
 	Join();
 }
 
+void ThreadManager::InitTLS()
+{
+	static Atomic<uint32> SThreadId = 1;
+	TL_ThreadId = SThreadId.fetch_add(1); //스레드 로컬에 있는 스레드 아이디 1씩증가
+}
+
+void ThreadManager::DestoryTLS()
+{
+}
+
 void ThreadManager::Launch(function<void(void)> callback)
 {
-	LockGuard guard(_lock);
-
-	_threads.push_back(thread([=]()
+	thread_vector.push_back(thread([=]()
 		{
 			InitTLS();
 			callback();
-			DestroyTLS();
 		}));
+	
 }
 
 void ThreadManager::Join()
 {
-	for (thread& t : _threads)
+	for (thread& _thread : thread_vector)
 	{
-		if (t.joinable())
-			t.join();
+		if (_thread.joinable())
+		{
+			_thread.join();
+		}
 	}
-	_threads.clear();
-}
-
-void ThreadManager::InitTLS()
-{
-	static Atomic<uint32> SThreadId = 1;
-	LThreadId = SThreadId.fetch_add(1);
-}
-
-void ThreadManager::DestroyTLS()
-{
-
-}
-
-void ThreadManager::DoGlobalQueueWork()
-{
-	while (true)
-	{
-		uint64 now = ::GetTickCount64();
-		if (now > LEndTickCount)
-			break;
-
-		JobQueueRef jobQueue = GGlobalQueue->Pop();
-		if (jobQueue == nullptr)
-			break;
-
-		jobQueue->Execute();
-	}
-}
-
-void ThreadManager::DistributeReservedJobs()
-{
-	const uint64 now = ::GetTickCount64();
-
-	GJobTimer->Distribute(now);
+	thread_vector.clear();
 }
