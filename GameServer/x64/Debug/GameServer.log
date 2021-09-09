@@ -1,1 +1,3 @@
-﻿  GameServer.vcxproj -> C:\Users\sngbi\source\repos\GameServer\BinaryDebug\GameServer.exe
+﻿  GameServerPch.cpp
+  GameServer.cpp
+  GameServer.vcxproj -> C:\Users\sngbi\source\repos\GameServer\BinaryDebug\GameServer.exe

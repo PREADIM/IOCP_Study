@@ -15,7 +15,6 @@ using uint32 = unsigned __int32;
 using uint64 = unsigned __int64;
 
 
-
 template<typename T>
 using Atomic = std::atomic<T>;
 using Mutex = std::mutex;
@@ -23,6 +22,15 @@ using CondVar = std::condition_variable;
 using UniqueLock = std::unique_lock<std::mutex>;
 using LockGuard = std::lock_guard<std::mutex>;
 
+
+
+//shared_ptr
+
+
+#define USING_SHARED_PTR(name)	using name##Ref = std::shared_ptr<class name>;
+
+USING_SHARED_PTR(IocpCore);
+USING_SHARED_PTR(IocpObject);
 
 
 

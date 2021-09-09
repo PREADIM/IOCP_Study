@@ -2,7 +2,7 @@
 #include "Lock.h"
 #include "CoreTLS.h"
 
-void Lock::WriteLock()
+void Lock::WriteLock(const char* name)
 {
 	const uint32 lockThreadId = (_lockFlag.load() & WRITE_THREAD_MASK) >> 16;
 	if (TL_ThreadId == lockThreadId)
@@ -32,7 +32,7 @@ void Lock::WriteLock()
 
 }
 
-void Lock::WriteUnLock()
+void Lock::WriteUnLock(const char* name)
 {
 	if ((_lockFlag.load() & READ_THREAD_MASK) != 0) // 0이 아니라는것은 READ_THREAD_MASK가 활성화 되어있다는 사실
 		CRASH("READING");
@@ -42,7 +42,7 @@ void Lock::WriteUnLock()
 		_lockFlag.store(EMPTY_FLAG); //EMPTY
 }
 
-void Lock::ReadLock()
+void Lock::ReadLock(const char* name)
 {
 	const uint32 lockThreadId = (_lockFlag.load() & WRITE_THREAD_MASK) >> 16;
 	if (TL_ThreadId == lockThreadId) // 같은 스레드 라면
@@ -66,7 +66,7 @@ void Lock::ReadLock()
 	}
 }
 
-void Lock::ReadUnLock()
+void Lock::ReadUnLock(const char* name)
 {
 	if ((_lockFlag.fetch_sub(1) & READ_THREAD_MASK) == 0) 
 		// atomic의 fetch_sub는 빼기전의 갑을 리턴하는데 해당값이 READ_THREAD_MASK와 &했을때 0이면

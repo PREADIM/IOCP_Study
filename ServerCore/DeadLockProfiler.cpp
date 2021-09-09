@@ -107,7 +107,7 @@ void DeadLockProfiler::DFS(int32 now)
 					break; // 찾음.
 			}
 
-			CRASH("DEADLOCK_DETECTED");
+			CRASH("DEADLOCK_DETECTED"); //크래시
 		}
 
 	}

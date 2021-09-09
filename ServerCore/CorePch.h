@@ -4,10 +4,13 @@
 #include "Container.h"
 #include "CorePch.h"
 #include "CoreTLS.h"
+#include "CoreGlobal.h"
+#include "Allocator.h"
 
 
 #include <Windows.h>
 #include <iostream>
+using namespace std;
 
 
 #include <winsock2.h>
