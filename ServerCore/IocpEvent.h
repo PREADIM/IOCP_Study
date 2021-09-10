@@ -17,6 +17,7 @@ public:
 	IocpEvent(EventType type);
 
 	void Init();
+	EventType GetType() { return _type; }
 
 public:
 	EventType _type;
@@ -44,7 +45,8 @@ class AcceptEvent : public IocpEvent
 public:
 	AcceptEvent() : IocpEvent(EventType::Accept) { }
 
-
+public:
+	SessionRef _session = nullptr;
 };
 
 

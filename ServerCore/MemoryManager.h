@@ -28,3 +28,28 @@ private:
 
 };
 
+
+
+
+template<typename Type, typename... Args>
+Type* Xnew(Args&&... args)
+{
+	Type* memory = static_cast<Type*>(PoolAllocator::Alloc(sizeof(Type)));
+	new(memory) Type(forward<Args>(args)...);
+	return memory;
+}
+
+
+template<typename Type>
+void Xdelete(Type* obj)
+{
+	ojb->~Type();
+	PoolAllocator::Release(obj);
+}
+
+
+template<typename Type, typename... Args>
+shared_ptr<Type> MakeShared(Args&&... args)
+{
+	return shared_ptr<Type>{ Xnew<Type>(forwared<Args>(args)...), Xdelete<Type> };
+}

@@ -31,6 +31,8 @@ using LockGuard = std::lock_guard<std::mutex>;
 
 USING_SHARED_PTR(IocpCore);
 USING_SHARED_PTR(IocpObject);
+USING_SHARED_PTR(Session);
+
 
 
 

@@ -1,8 +1,9 @@
 #pragma once
 
 // ★ IocpObject ★
-
-class IocpObject //이 클래스를 상속해서 Iocp에서 이용할 오브젝트를 만든다.
+// 
+//이 클래스를 상속해서 Iocp에서 이용할 오브젝트들을 만든다.
+class IocpObject : public enable_shared_from_this<IocpObject>
 {
 public:
 	virtual HANDLE GetHandle() abstract;

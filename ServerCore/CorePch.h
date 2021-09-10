@@ -6,6 +6,7 @@
 #include "CoreTLS.h"
 #include "CoreGlobal.h"
 #include "Allocator.h"
+#include "MemoryManager.h"
 
 
 #include <Windows.h>
