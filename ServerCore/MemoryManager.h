@@ -1,7 +1,7 @@
 #pragma once
+#include "Allocator.h"
 
 class MemoryPool;
-
 
 class MemoryManager
 {
@@ -43,7 +43,7 @@ Type* Xnew(Args&&... args)
 template<typename Type>
 void Xdelete(Type* obj)
 {
-	ojb->~Type();
+	obj->~Type();
 	PoolAllocator::Release(obj);
 }
 
@@ -51,5 +51,5 @@ void Xdelete(Type* obj)
 template<typename Type, typename... Args>
 shared_ptr<Type> MakeShared(Args&&... args)
 {
-	return shared_ptr<Type>{ Xnew<Type>(forwared<Args>(args)...), Xdelete<Type> };
+	return shared_ptr<Type>{ Xnew<Type>(forward<Args>(args)...), Xdelete<Type> };
 }

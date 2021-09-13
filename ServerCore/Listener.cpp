@@ -4,6 +4,7 @@
 #include "IocpEvent.h"
 #include "Session.h"
 #include "SocketUtils.h"
+#include "Service.h"
 
 Listener::~Listener()
 {
@@ -24,23 +25,26 @@ void Listener::Dispatch(IocpEvent* iocpEvent, int32 numOfByte) // iocp코어에서 �
 {
 	switch (iocpEvent->GetType())
 	{
-	case EventType::Accept :
+	case EventType::Accept:
 		AcceptEvent* acceptEvent = static_cast<AcceptEvent*>(iocpEvent);
 		ProcessAccept(acceptEvent); // 미끼를 달아서 낚시대를 던져둔 것을 회수하여 처리하는 함수.
 	default:
-
+		CRASH();
 	}
-
 }
 
-bool Listener::StartAccept(NetAddress netAddress)
+bool Listener::StartAccept(ServerServiceRef service)
 {
+	_serverService = service;
+	if(_serverService == nullptr)
+		return false;
+
 	_socket = SocketUtils::CreateSocket(); // 소켓 생성
 	if (_socket == INVALID_SOCKET)
 		return false;
 
 	//Iocp코드와 연동
-	if (GIocpCore->Register(shared_from_this()) == false)
+	if (_serverService->GetIocpCore()->Register(shared_from_this()) == false)
 		return false;
 
 	//소켓 옵션들 설정
@@ -51,7 +55,7 @@ bool Listener::StartAccept(NetAddress netAddress)
 		return false;
 
 	// 바인드
-	if (SocketUtils::Bind(_socket, netAddress) == false)
+	if (SocketUtils::Bind(_socket, _serverService->GetNetAddress()) == false)
 		return false;
 
 	//리슨
@@ -59,10 +63,11 @@ bool Listener::StartAccept(NetAddress netAddress)
 		return false;
 
 
-	const int32 accepCount = 1;
+	const int32 accepCount = _serverService->GetMaxSessionCount();
 	for (int32 i = 0; i < accepCount; i++)
 	{
 		AcceptEvent* acceptEvent = Xnew<AcceptEvent>();
+		acceptEvent->owner = shared_from_this();
 		_acceptEvents.push_back(acceptEvent);
 		RegisterAccept(acceptEvent); // 미끼를 걸어서 낚시대를 던지는 행위. 처리하는 함수가 아님x
 	}
@@ -76,7 +81,7 @@ void Listener::CloseSocket()
 
 void Listener::RegisterAccept(AcceptEvent* acceptEvent)
 {
-	//SessionRef session = _serverService->CreateSession();
+	SessionRef session = _serverService->CreateSession();
 
 	acceptEvent->Init();
 	acceptEvent->_session = session;
@@ -131,7 +136,7 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 
 	SOCKADDR_IN sockAddress;
 	int32 sizeOfSockAddr = sizeof(sockAddress);
-	if (SOCKET_ERROR == ::getpeername(session->GetSocket(), reinterpret_cast<SOCKADDR*>(&sockAddress), &sizeOfSockAddr));
+	if (SOCKET_ERROR == ::getpeername(session->GetSocket(), reinterpret_cast<SOCKADDR*>(&sockAddress), &sizeOfSockAddr)) // 연결된 상대의 주솟값 얻어오는 함수.
 	{
 		RegisterAccept(acceptEvent); // 새롭게 낚시대 던지기.
 		return;
@@ -139,7 +144,7 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 
 	cout << "Client Connect !!" << endl;
 
-	session->SetNetAddress(NetAddress(sockAddress));
+	session->SetNetAddress(NetAddress(sockAddress)); //세션에다가 얻어돈 NetAddress 대입해주기. 세션은 클라이언트에 필요한 것들이 모여있는 집합체.
 	//session->ProcessConnect();
 	RegisterAccept(acceptEvent);
 

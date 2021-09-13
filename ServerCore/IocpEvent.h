@@ -1,6 +1,8 @@
 #pragma once
 
 
+class Session;
+
 enum EventType : uint8
 {
 	Connect,
@@ -17,10 +19,10 @@ public:
 	IocpEvent(EventType type);
 
 	void Init();
-	EventType GetType() { return _type; }
+	EventType GetType() { return _eventType; }
 
 public:
-	EventType _type;
+	EventType _eventType;
 	IocpObjectRef owner;
 };
 
