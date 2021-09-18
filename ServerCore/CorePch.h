@@ -17,6 +17,7 @@ using namespace std;
 #include <winsock2.h>
 #include <MSWSock.h>
 #include <WS2tcpip.h>
-#pragma comment (lib, "ws2_32.lib")
+
+#pragma comment(lib, "ws2_32.lib")
 
 #include "Lock.h"

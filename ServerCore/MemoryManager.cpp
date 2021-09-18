@@ -73,7 +73,7 @@ void* MemoryManager::Allocate(int32 size)
 	}
 #endif //  _STOMP
 
-	return MemoryHeader::AttachHeader(header, size);
+	return MemoryHeader::AttachHeader(header, allocSize);
 }
 
 void MemoryManager::Release(void* ptr)
@@ -84,7 +84,7 @@ void MemoryManager::Release(void* ptr)
 	ASSERT_CRASH(allocSize > 0); // allocSize가 0보다 작은거면 이상한 것이므로 크래시
 
 #ifdef _STOMP
-	StompAllocator::Release(ptr);
+	StompAllocator::Release(header);
 #else
 	if (allocSize > MAX_ALLOC_SIZE) // 사이즈가 맥스 ALLOC보다 크면 메모리풀에 만드는것보다 따로만드는게 좋다.
 	{

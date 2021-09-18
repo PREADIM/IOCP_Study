@@ -29,7 +29,7 @@ void* StompAllocator::Alloc(int32 size)
 	//데이터를 사이즈 만큼 뒤로 밀어서 뒤부터 작성함 (메모리 오버플로를 막기위해)
 }
 
-void StompAllocator::Reserve(void* ptr)
+void StompAllocator::Release(void* ptr)
 {
 	const int64 address = reinterpret_cast<int64>(ptr);
 	const int64 baseAddress = address % PAGE_SIZE;

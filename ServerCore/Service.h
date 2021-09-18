@@ -22,9 +22,9 @@ public:
 	Service(ServiceType type, NetAddress netAddress, IocpCoreRef iocpCore, SessionCreateFunc sessionFunc, int32 maxSessionCount = 1);
 	virtual ~Service();
 
-
 	virtual bool Start() abstract;
 	virtual void CloseService();
+
 
 	bool CanStart() { return _sessionFunc != nullptr; }
 	void SetSessionFunc(SessionCreateFunc func) { _sessionFunc = func; }
@@ -43,6 +43,7 @@ public:
 
 
 protected : //¸â¹ö º¯¼öµé
+
 	USE_LOCK;
 
 	ServiceType _type;
@@ -81,7 +82,7 @@ public:
 	virtual ~ServerService() {}
 
 	virtual bool Start() override;
-	virtual void CloseService();
+	virtual void CloseService() override;
 
 private:
 	ListenerRef _listener = nullptr;

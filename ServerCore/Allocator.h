@@ -5,8 +5,8 @@
 class BaseAllocator
 {
 public :
-	void* Alloc(int32 size);
-	void Reserve(void* ptr);
+	static void* Alloc(int32 size);
+	static void Reserve(void* ptr);
 };
 
 
@@ -17,8 +17,8 @@ class StompAllocator
 	enum { PAGE_SIZE = 0x1000 };
 
 public:
-	void* Alloc(int32 size);
-	void Reserve(void* ptr);
+	static void* Alloc(int32 size);
+	static void Release(void* ptr);
 };
 
 
@@ -28,8 +28,8 @@ public:
 class PoolAllocator
 {
 public:
-	void* Alloc(int32 size);
-	void Release(void* ptr);
+	static void* Alloc(int32 size);
+	static void Release(void* ptr);
 };
 
 
@@ -37,26 +37,24 @@ public:
 //¡Ú STLAllocator ¡Ú//
 
 template<typename T>
-class STLAllocator
+class StlAllocator
 {
-	using Type_Value = T;
-
 public:
+	using value_type = T;
+
+	StlAllocator() { }
+
+	template<typename Other>
+	StlAllocator(const StlAllocator<Other>&) { }
+
 	T* allocate(size_t count)
 	{
-		const int32 allocSize = static_cast<int32>(count + sizeof(T));
-		return static_cast<T*>(PoolAllocator::Alloc(allocSize));
+		const int32 size = static_cast<int32>(count * sizeof(T));
+		return static_cast<T*>(PoolAllocator::Alloc(size));
 	}
 
 	void deallocate(T* ptr, size_t count)
 	{
 		PoolAllocator::Release(ptr);
 	}
-
-	template<typename U>
-	bool operator== (const STLAllocator<U>&) { return true; }
-
-	template<typename U>
-	bool operator!= (const STLAllocator<U>&) { return false; }
-
 };

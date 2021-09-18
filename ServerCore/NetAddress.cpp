@@ -22,5 +22,5 @@ IN_ADDR NetAddress::Ip2Address(const WCHAR* ip)
 {
 	IN_ADDR address;
 	::InetPtonW(AF_INET, ip, &address); // WCHAR라서 뒤에 W붙음 inet_pton과 같음.
-	return IN_ADDR();
+	return address;
 }

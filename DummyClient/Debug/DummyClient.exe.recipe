@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\sngbi\source\repos\GameServer\Debug\DummyClient.exe</FullPath>
+      <FullPath>C:\Users\sngbi\source\repos\GameServer\Binary\Debug\DummyClient.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

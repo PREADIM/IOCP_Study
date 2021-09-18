@@ -1,2 +1,20 @@
-﻿  GameServer.cpp
-  GameServer.vcxproj -> C:\Users\sngbi\source\repos\GameServer\Debug\GameServer.exe
+﻿  GameServerPch.cpp
+  GameServer.cpp
+  LINK : C:\Users\sngbi\source\repos\GameServer\BinaryDebug\GameServer.exe을(를) 찾을 수 없거나 마지막 증분 링크에 의해 빌드되지 않았습니다. 전체 링크를 수행하고 있습니다.
+GameServer.obj : error LNK2019: "public: static void * __cdecl PoolAllocator::Alloc(int)" (?Alloc@PoolAllocator@@SAPAXH@Z)"class GameSession * __cdecl Xnew<class GameSession>(void)" (??$Xnew@VGameSession@@$$V@@YAPAVGameSession@@XZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: static void __cdecl PoolAllocator::Release(void *)" (?Release@PoolAllocator@@SAXPAX@Z)"void __cdecl Xdelete<class GameSession>(class GameSession *)" (??$Xdelete@VGameSession@@@@YAXPAVGameSession@@@Z) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: void __thiscall ThreadManager::Launch(class std::function<void __cdecl(void)>)" (?Launch@ThreadManager@@QAEXV?$function@$$A6AXXZ@std@@@Z)_main 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: void __thiscall ThreadManager::Join(void)" (?Join@ThreadManager@@QAEXXZ)_main 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: __thiscall NetAddress::NetAddress(class std::basic_string<wchar_t,struct std::char_traits<wchar_t>,class std::allocator<wchar_t> >,unsigned short)" (??0NetAddress@@QAE@V?$basic_string@_WU?$char_traits@_W@std@@V?$allocator@_W@2@@std@@G@Z)_main 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: __thiscall IocpCore::IocpCore(void)" (??0IocpCore@@QAE@XZ)"class IocpCore * __cdecl Xnew<class IocpCore>(void)" (??$Xnew@VIocpCore@@$$V@@YAPAVIocpCore@@XZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: __thiscall IocpCore::~IocpCore(void)" (??1IocpCore@@QAE@XZ)"public: void * __thiscall IocpCore::`scalar deleting destructor'(unsigned int)" (??_GIocpCore@@QAEPAXI@Z) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: bool __thiscall IocpCore::Dispatch(unsigned int)" (?Dispatch@IocpCore@@QAE_NI@Z)"public: __thiscall <lambda_efc6c689078c4a4b722342573f65d7c6>::operator()(void)const " (??R<lambda_efc6c689078c4a4b722342573f65d7c6>@@QBE@XZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: __thiscall ServerService::ServerService(class NetAddress,class std::shared_ptr<class IocpCore>,class std::function<class std::shared_ptr<class Session> __cdecl(void)>,int)" (??0ServerService@@QAE@VNetAddress@@V?$shared_ptr@VIocpCore@@@std@@V?$function@$$A6A?AV?$shared_ptr@VSession@@@std@@XZ@3@H@Z)"class ServerService * __cdecl Xnew<class ServerService,class NetAddress,class std::shared_ptr<class IocpCore>,class std::shared_ptr<class GameSession> (__cdecl&)(void),int>(class NetAddress &&,class std::shared_ptr<class IocpCore> &&,class std::shared_ptr<class GameSession> (__cdecl&)(void),int &&)" (??$Xnew@VServerService@@VNetAddress@@V?$shared_ptr@VIocpCore@@@std@@A6A?AV?$shared_ptr@VGameSession@@@4@XZH@@YAPAVServerService@@$$QAVNetAddress@@$$QAV?$shared_ptr@VIocpCore@@@std@@A6A?AV?$shared_ptr@VGameSession@@@3@XZ$$QAH@Z) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: __thiscall Session::Session(void)" (??0Session@@QAE@XZ)"public: __thiscall GameSession::GameSession(void)" (??0GameSession@@QAE@XZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: virtual __thiscall Session::~Session(void)" (??1Session@@UAE@XZ)"public: virtual __thiscall GameSession::~GameSession(void)" (??1GameSession@@UAE@XZ) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2019: "public: void __thiscall Session::Send(unsigned char *,int)" (?Send@Session@@QAEXPAEH@Z)"public: virtual int __thiscall GameSession::OnRecv(unsigned char *,int)" (?OnRecv@GameSession@@UAEHPAEH@Z) 함수에서 참조되는 확인할 수 없는 외부 기호
+GameServer.obj : error LNK2001: 확인할 수 없는 외부 기호 "public: virtual void * __thiscall Session::GetHandle(void)" (?GetHandle@Session@@UAEPAXXZ)
+GameServer.obj : error LNK2001: 확인할 수 없는 외부 기호 "public: virtual void __thiscall Session::Dispatch(class IocpEvent *,int)" (?Dispatch@Session@@UAEXPAVIocpEvent@@H@Z)
+GameServer.obj : error LNK2001: 확인할 수 없는 외부 기호 "class ThreadManager * GThreadManager" (?GThreadManager@@3PAVThreadManager@@A)
+C:\Users\sngbi\source\repos\GameServer\Libraries\Debug\ServerCore.lib : warning LNK4272: 'x64' 라이브러리 컴퓨터 종류가 'x86' 대상 컴퓨터 종류와 충돌합니다.
+C:\Users\sngbi\source\repos\GameServer\BinaryDebug\GameServer.exe : fatal error LNK1120: 15개의 확인할 수 없는 외부 참조입니다.

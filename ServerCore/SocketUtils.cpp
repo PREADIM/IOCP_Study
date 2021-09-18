@@ -10,14 +10,15 @@ LPFN_DISCONNECTEX SocketUtils::DisconnectEx = nullptr;
 void SocketUtils::Init()
 {
 	WSADATA wsaData;
-	ASSERT_CRASH(::WSAStartup(MAKEWORD(2, 2), &wsaData) == 0);
+	ASSERT_CRASH(::WSAStartup(MAKEWORD(2, 2), OUT & wsaData) == 0);
 
+	/* 런타임에 주소 얻어오는 API */
 	SOCKET dummySocket = CreateSocket();
 	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_CONNECTEX, reinterpret_cast<LPVOID*>(&ConnectEx)));
-	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_ACCEPTEX, reinterpret_cast<LPVOID*>(&AcceptEx)));
 	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_DISCONNECTEX, reinterpret_cast<LPVOID*>(&DisconnectEx)));
+	ASSERT_CRASH(BindWindowsFunction(dummySocket, WSAID_ACCEPTEX, reinterpret_cast<LPVOID*>(&AcceptEx)));
 
-	Close(dummySocket); // 잠시 사용했던 소켓 다시 초기화.
+	Close(dummySocket);
 }
 
 void SocketUtils::Clear()
@@ -27,7 +28,7 @@ void SocketUtils::Clear()
 bool SocketUtils::BindWindowsFunction(SOCKET socket, GUID guid, LPVOID* LPFN_fn)
 {
 	DWORD bytes = 0;
-	return ::WSAIoctl(socket, SIO_GET_EXTENSION_FUNCTION_POINTER,
+	return SOCKET_ERROR != ::WSAIoctl(socket, SIO_GET_EXTENSION_FUNCTION_POINTER,
 		&guid, sizeof(guid), 
 		LPFN_fn, sizeof(LPFN_fn), 
 		&bytes, NULL, NULL);	
@@ -52,7 +53,7 @@ bool SocketUtils::BindServerAnyAddress(SOCKET socket, uint16 port) // 서버용.
 	SOCKADDR_IN myAddress;
 	myAddress.sin_family = AF_INET;
 	myAddress.sin_addr.s_addr = ::htonl(INADDR_ANY);
-	myAddress.sin_port = ::htons(port);
+	myAddress.sin_port = ::htons(port); // 0이 오면 알아서 남는거 할당.
 
 	return SOCKET_ERROR != ::bind(socket, reinterpret_cast<const SOCKADDR*>(&myAddress), sizeof(myAddress));
 }
@@ -73,8 +74,8 @@ void SocketUtils::Close(SOCKET& socket)
 bool SocketUtils::SetLinger(SOCKET socket, uint16 onoff, uint16 linger)
 {
 	LINGER option;
-	option.l_linger = linger;
 	option.l_onoff = onoff;
+	option.l_linger = linger;
 
 	return SetSockOption(socket, SOL_SOCKET, SO_LINGER, option);
 }

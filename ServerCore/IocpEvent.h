@@ -3,7 +3,7 @@
 
 class Session;
 
-enum EventType : uint8
+enum class EventType : uint8
 {
 	Connect,
 	Disconnect,
@@ -17,9 +17,7 @@ class IocpEvent : public OVERLAPPED
 {
 public:
 	IocpEvent(EventType type);
-
 	void Init();
-	EventType GetType() { return _eventType; }
 
 public:
 	EventType _eventType;
@@ -35,11 +33,14 @@ public:
 };
 
 
+
 class DisconnectEvent : public IocpEvent
 {
 public:
 	DisconnectEvent() : IocpEvent(EventType::Disconnect) { }
 };
+
+
 
 
 class AcceptEvent : public IocpEvent
@@ -65,6 +66,8 @@ class SendEvent : public IocpEvent
 {
 public:
 	SendEvent() : IocpEvent(EventType::Send) { }
+
+	Vector<BYTE> buffer;
 };
 
 

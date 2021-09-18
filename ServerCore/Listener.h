@@ -28,7 +28,7 @@ private:
 protected:
 	SOCKET _socket = INVALID_SOCKET;
 	Vector<AcceptEvent*> _acceptEvents;
-	ServerServiceRef _serverService;
+	ServerServiceRef _serverService = nullptr; // 필요한 작업을 다 가지고있는 것.
 
 };
 

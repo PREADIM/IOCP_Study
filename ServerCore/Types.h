@@ -32,14 +32,17 @@ using LockGuard = std::lock_guard<std::mutex>;
 USING_SHARED_PTR(IocpCore);
 USING_SHARED_PTR(IocpObject);
 USING_SHARED_PTR(Session);
-USING_SHARED_PTR(PacketSession);
+//USING_SHARED_PTR(PacketSession);
 USING_SHARED_PTR(Listener);
 USING_SHARED_PTR(ServerService);
 USING_SHARED_PTR(ClientService);
 
 
 
-
+#define size16(val)	static_cast<int16>(sizeof(val))
+#define size32(val) static_cast<int32>(sizeof(val))
+#define len16(arr)	static_cast<int16>(sizeof(arr)/sizeof(arr[0]))
+#define len32(arr)	static_cast<int32>(sizeof(arr)/sizeof(arr[0]))
 
 
 
