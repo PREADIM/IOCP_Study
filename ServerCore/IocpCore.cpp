@@ -22,7 +22,7 @@ bool IocpCore::Register(IocpObjectRef iocpObject)
 
 bool IocpCore::Dispatch(uint32 timeOutMs)
 {
-	DWORD numOfByte = 0;
+	DWORD numOfByte = 0; // 데이터의 크기
 	ULONG_PTR key = 0;
 	IocpEvent* iocpEvent = nullptr; // 데이터를 받아와서 이걸로 무엇을 행동할지 판단한다.
 

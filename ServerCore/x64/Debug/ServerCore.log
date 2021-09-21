@@ -16,6 +16,8 @@ C:\Users\sngbi\source\repos\GameServer\ServerCore\Lock.cpp(51,19): warning C4244
   MemoryManager.cpp
   MemoryPool.cpp
   NetAddress.cpp
+  RecvBuffer.cpp
+  SendBuffer.cpp
   Service.cpp
   Session.cpp
   SocketUtils.cpp

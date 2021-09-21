@@ -81,6 +81,12 @@
     <ClCompile Include="LockQueue.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
+    <ClCompile Include="RecvBuffer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="SendBuffer.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CorePch.h">
@@ -148,6 +154,12 @@
     </ClInclude>
     <ClInclude Include="Types.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="RecvBuffer.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SendBuffer.h">
+      <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

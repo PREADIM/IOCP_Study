@@ -36,6 +36,7 @@ USING_SHARED_PTR(Session);
 USING_SHARED_PTR(Listener);
 USING_SHARED_PTR(ServerService);
 USING_SHARED_PTR(ClientService);
+USING_SHARED_PTR(SendBuffer);
 
 
 

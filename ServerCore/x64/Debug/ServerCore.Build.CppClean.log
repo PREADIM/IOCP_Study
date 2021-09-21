@@ -6,6 +6,8 @@ c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\threadmanager.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\socketutils.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\session.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\service.obj
+c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\sendbuffer.obj
+c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\recvbuffer.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\netaddress.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\memorypool.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\memorymanager.obj

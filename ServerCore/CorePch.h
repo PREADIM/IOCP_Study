@@ -21,3 +21,4 @@ using namespace std;
 #pragma comment(lib, "ws2_32.lib")
 
 #include "Lock.h"
+#include "SendBuffer.h"

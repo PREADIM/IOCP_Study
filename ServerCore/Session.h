@@ -2,6 +2,7 @@
 #include "IocpCore.h"
 #include "IocpEvent.h"
 #include "NetAddress.h"
+#include "RecvBuffer.h"
 
 
 class Service;
@@ -12,6 +13,11 @@ class Session : public IocpObject
 	friend class IocpCore;
 	friend class Service;
 
+	enum
+	{
+		BUFFER_SIZE = 0x10000
+	};
+
 
 public :
 	Session();
@@ -19,7 +25,7 @@ public :
 
 
 public:
-	void				Send(BYTE* buffer, int32 len);
+	void				Send(SendBufferRef sendBuffer);
 	bool				Connect();
 	void				Disconnect(const WCHAR* cause);
 
@@ -46,14 +52,14 @@ private:
 	bool				RegisterConnect();
 	bool				RegisterDisconnect();
 	void				RegisterRecv();
-	void				RegisterSend(SendEvent* sendEvent);
+	void				RegisterSend();
 
 
 	// 처리
 	void				ProcessConnect();
 	void				ProcessDisconnect();
 	void				ProcessRecv(int32 numOfBytes);
-	void				ProcessSend(SendEvent* sendEvent, int32 numOfBytes);
+	void				ProcessSend(int32 numOfBytes);
 
 	void				HandleError(int32 errorCode);
 
@@ -67,12 +73,6 @@ protected:
 
 
 
-public:
-	BYTE _recvBuffer[1000];
-
-	char _sendBuffer[1000];
-	int32 _sendLen = 0;
-
 private:
 	weak_ptr<Service> _service; //weak_ptr은 shared_ptr처럼 쓸수있지만 레퍼런스 카운팅이 증가되지않는다.
 
@@ -85,7 +85,11 @@ private:
 
 	/* 수신 관련 */
 
+	RecvBuffer _recvBuffer;
+
 	/* 송신 관련 */
+	Queue<SendBufferRef> _sendQueue;
+	Atomic<bool> _sendRegister = false; // RegisterSend 중인가?
 
 private:
 	/* IocpEvent 재사용 */
@@ -93,7 +97,7 @@ private:
 	ConnectEvent		_connectEvent;
 	DisconnectEvent		_disconnectEvent;
 	RecvEvent			_recvEvent;
-
+	SendEvent			_sendEvent;
 
 };
 

@@ -77,13 +77,13 @@ void Listener::CloseSocket()
 // 낚시 미끼 던짐.
 void Listener::RegisterAccept(AcceptEvent* acceptEvent)
 {
-	SessionRef session = _serverService->CreateSession();
+	SessionRef session = _serverService->CreateSession(); // 쿠팡잇츠, 정보를 아는 담당형사 같은느낌
 
 	acceptEvent->Init();
 	acceptEvent->_session = session; //OVERLAPPED 상속 클래스에 보관.
 
 	DWORD byteReceived = 0;
-	if(false == SocketUtils::AcceptEx(_socket, session->GetSocket(), session->_recvBuffer, 0,
+	if(false == SocketUtils::AcceptEx(_socket, session->GetSocket(), session->_recvBuffer.WritePos(), 0,
 		sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16,
 		&byteReceived, static_cast<LPOVERLAPPED>(acceptEvent)))
 	{
@@ -140,7 +140,8 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 
 	cout << "Client Connect !!" << endl;
 
-	session->SetNetAddress(NetAddress(sockAddress)); //세션에다가 얻어돈 NetAddress 대입해주기. 세션은 클라이언트에 필요한 것들이 모여있는 집합체.
+	//여기서 말하는 session은 연결된 상대의 정보를 저장하고 주고 받고 할수있게 상담원을 배치해주는 것.
+	session->SetNetAddress(NetAddress(sockAddress)); //세션에다가 얻어온 NetAddress 대입해주기. 세션은 클라이언트에 대한 것들이 모여있는 집합체.
 	session->ProcessConnect(); // 커넥트 완료! 클라이언트 쪽에서 Recv 하게 해줌
 	RegisterAccept(acceptEvent);
 
