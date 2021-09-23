@@ -6,11 +6,13 @@ enum
 };
 
 
+
 //★ <MemoryHeader> ★
 
 DECLSPEC_ALIGN(SLIST_ALIGNMENT) // 16진수 정렬
 struct MemoryHeader : public SLIST_ENTRY // 메모리풀을 이용할 노드같은 단위 + 헤더를 이용하여 데이터 조립 및 해체 구조체.
 {
+	//[MemoryHeader][Data]
 	MemoryHeader(int32 size) : _allocSize(size) { }
 
 	static void* AttachHeader(MemoryHeader* header, int32 size) 

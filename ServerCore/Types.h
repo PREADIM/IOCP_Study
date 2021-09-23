@@ -37,6 +37,7 @@ USING_SHARED_PTR(Listener);
 USING_SHARED_PTR(ServerService);
 USING_SHARED_PTR(ClientService);
 USING_SHARED_PTR(SendBuffer);
+USING_SHARED_PTR(SendBufferChunk);
 
 
 

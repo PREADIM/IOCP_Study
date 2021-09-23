@@ -1,12 +1,20 @@
 #include "pch.h"
 #include "Lock.h"
 #include "CoreTLS.h"
+#include "DeadLockProfiler.h"
 
 void Lock::WriteLock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PushLock(name);
+#endif
 	const uint32 lockThreadId = (_lockFlag.load() & WRITE_THREAD_MASK) >> 16;
 	if (TL_ThreadId == lockThreadId)
+	{
+		_writeCount++; // 중요 ! ★★
 		return;
+	}
+
 
 	const uint32 beginTick = ::GetTickCount64();
 	const uint32 desired = (TL_ThreadId << 16) & WRITE_THREAD_MASK; //
@@ -22,8 +30,9 @@ void Lock::WriteLock(const char* name)
 			}
 		}
 		
-		if (::GetTickCount64() - beginTick > TIMEOUT_TICK)
+		if (::GetTickCount64() - beginTick >= TIMEOUT_TICK)
 		{
+			cout << name << endl;
 			CRASH("LOCK TIMEOUT");
 		}
 
@@ -34,6 +43,9 @@ void Lock::WriteLock(const char* name)
 
 void Lock::WriteUnLock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PopLock(name);
+#endif
 	if ((_lockFlag.load() & READ_THREAD_MASK) != 0) // 0이 아니라는것은 READ_THREAD_MASK가 활성화 되어있다는 사실
 		CRASH("READING");
 
@@ -44,9 +56,16 @@ void Lock::WriteUnLock(const char* name)
 
 void Lock::ReadLock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PushLock(name);
+#endif
 	const uint32 lockThreadId = (_lockFlag.load() & WRITE_THREAD_MASK) >> 16;
 	if (TL_ThreadId == lockThreadId) // 같은 스레드 라면
-		return; 
+	{
+		_lockFlag.fetch_add(1); // 중요 ! ★★
+		return;
+	}
+
 
 	uint32 beginTick = ::GetTickCount64();
 	while (true)
@@ -59,7 +78,7 @@ void Lock::ReadLock(const char* name)
 				return;
 		}
 
-		if (::GetTickCount64() - beginTick > TIMEOUT_TICK)
+		if (::GetTickCount64() - beginTick >= TIMEOUT_TICK)
 			CRASH("TIMEOUT READ");
 
 		this_thread::yield();
@@ -68,6 +87,9 @@ void Lock::ReadLock(const char* name)
 
 void Lock::ReadUnLock(const char* name)
 {
+#if _DEBUG
+	GDeadLockProfiler->PopLock(name);
+#endif
 	if ((_lockFlag.fetch_sub(1) & READ_THREAD_MASK) == 0) 
 		// atomic의 fetch_sub는 빼기전의 갑을 리턴하는데 해당값이 READ_THREAD_MASK와 &했을때 0이면
 		// 이미 _lockFlag는 0이라는 뜻이니깐 무언가 이상하다는 것이다.

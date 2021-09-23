@@ -17,8 +17,10 @@ public:
 	{
 		cout << "Connected To Server" << endl;
 
-		SendBufferRef sendBuffer = MakeShared<SendBuffer>(4096);
-		sendBuffer->CopyData(sendData, sizeof(sendData));
+		SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+		::memcpy(sendBuffer->Buffer(), sendData, sizeof(sendData));
+		sendBuffer->Close(sizeof(sendData)); // 다 사용하면 닫아주기.
+
 		Send(sendBuffer);
 	}
 
@@ -28,8 +30,10 @@ public:
 
 		this_thread::sleep_for(1s);
 
-		SendBufferRef sendBuffer = MakeShared<SendBuffer>(4096);
-		sendBuffer->CopyData(sendData, sizeof(sendData));
+		SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
+		::memcpy(sendBuffer->Buffer(), sendData, sizeof(sendData));
+		sendBuffer->Close(sizeof(sendData)); // 다 사용하면 닫아주기.
+
 		Send(sendBuffer);
 
 		return len;
@@ -54,7 +58,7 @@ int main()
 		NetAddress(L"127.0.0.1", 7777),
 		MakeShared<IocpCore>(),
 		MakeShared<ServerSession>, // TODO : SessionManager 등
-		5);
+		1);
 
 	ASSERT_CRASH(service->Start());
 

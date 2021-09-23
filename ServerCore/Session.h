@@ -89,7 +89,7 @@ private:
 
 	/* 송신 관련 */
 	Queue<SendBufferRef> _sendQueue;
-	Atomic<bool> _sendRegister = false; // RegisterSend 중인가?
+	Atomic<bool> _sendRegistered = false; // RegisterSend 중인가?
 
 private:
 	/* IocpEvent 재사용 */

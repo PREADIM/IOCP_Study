@@ -9,6 +9,7 @@
 ThreadManager* GThreadManager = nullptr;
 MemoryManager* GMemoryManager = nullptr;
 DeadLockProfiler* GDeadLockProfiler = nullptr;
+SendBufferManager* GSendBufferManager = nullptr;
 
 class CoreGlobal
 {
@@ -18,6 +19,7 @@ public:
 		GThreadManager = new ThreadManager;
 		GMemoryManager = new MemoryManager;
 		GDeadLockProfiler = new DeadLockProfiler;
+		GSendBufferManager = new SendBufferManager;
 		SocketUtils::Init();
 	}
 	~CoreGlobal()

@@ -33,15 +33,22 @@ void DeadLockProfiler::PushLock(const char* name)
 			}
 		}
 	}
+
 	TL_LockStack.push(lockId);		
 }
 
 void DeadLockProfiler::PopLock(const char* name)
 {
-	ASSERT_CRASH(TL_LockStack.empty());
+	LockGuard guard(_lock);
+
+	if (TL_LockStack.empty())
+	{
+		CRASH("MULTIPLE_UNLOCK");
+	}
 
 	int32 lockId = _nameToId[name];
-	ASSERT_CRASH(lockId == TL_LockStack.top()); //가장 최근에 넣은 Id가 아닐경우 크래시
+	if (TL_LockStack.top() != lockId)
+		CRASH("INVALID_UNLOCK");	//가장 최근에 넣은 Id가 아닐경우 크래시
 
 	TL_LockStack.pop();
 }

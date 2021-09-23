@@ -46,7 +46,7 @@ MemoryHeader* MemoryPool::MRent() // 메모리 풀에서 빌리는 함수.
 		_reserveCount.fetch_add(1);
 	}
 
-	_useCount.fetch_sub(1);
+	_useCount.fetch_add(1);
 
 	return memory;
 }
