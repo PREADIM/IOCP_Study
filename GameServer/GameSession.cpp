@@ -12,21 +12,16 @@ void GameSession::OnDisconnected()
 	GSessionManager.Remove(static_pointer_cast<GameSession>(shared_from_this()));
 }
 
-int32 GameSession::OnRecv(BYTE* buffer, int32 len)
+int32 GameSession::OnRecvPacket(BYTE* buffer, int32 len)
 {
-	// Echo
-	cout << "OnRecv Len = " << len << endl;
+	PacketHeader header = *((PacketHeader*)buffer);
 
-	SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-	::memcpy(sendBuffer->Buffer(), buffer, len);
-	sendBuffer->Close(len); // 다 사용하면 닫아주기.
-
-	GSessionManager.Broadcast(sendBuffer); // 모든애들한테 전달. 브로드 캐스팅
+	cout << "Packet ID :" << header.id << "Size :" << header.size << endl;
 
 	return len;
 }
 
 void GameSession::OnSend(int32 len)
 {
-	cout << "OnSend Len = " << len << endl;
+	
 }

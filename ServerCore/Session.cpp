@@ -18,15 +18,23 @@ Session::~Session()
 
 void Session::Send(SendBufferRef sendBuffer)
 {
+	if (IsConnected() == false)
+		return;
+
+	bool registerSend = false;
+
 	// 현재 RegisterSend가 걸리지 않은 상태라면 , 걸어준다.
-	WRITE_LOCK;
+	{
+		WRITE_LOCK;
 
-	_sendQueue.push(sendBuffer); // 완료통지가 되지않으면 큐에 계속해서 쌓인다.
+		_sendQueue.push(sendBuffer); // 완료통지가 되지않으면 큐에 계속해서 쌓인다.
 
-	if (_sendRegistered.exchange(true) == false) // 완료 통지.
+		if (_sendRegistered.exchange(true) == false) // 완료 통지.
+			registerSend = true;
+	}
+
+	if (registerSend)
 		RegisterSend();
-
-	cout << "Test" << endl;
 
 }
 
@@ -46,15 +54,13 @@ bool Session::Connect()
 
 
 
-void Session::Disconnect(const WCHAR* cause)
+void Session::Disconnect(const WCHAR* cause) // HandleError 함수에서 Disconnect 호출.
 {
 	if (_connected.exchange(false) == false)
 		return;
 
 	wcout << "Disconnect : " << cause << endl;
 
-	OnDisconnected(); // 오버로딩
-	GetService()->ReleaseSession(GetSessionRef());
 
 	RegisterDisconnect();
 }
@@ -235,8 +241,6 @@ void Session::RegisterSend()
 		}
 	}
 
-	cout << "Test2" << endl;
-
 }
 
 
@@ -262,7 +266,15 @@ void Session::ProcessConnect()
 void Session::ProcessDisconnect()
 {
 
-	_disconnectEvent.owner = nullptr;
+	_disconnectEvent.owner = nullptr; //RELEASE_REF
+
+
+	OnDisconnected(); // 오버로딩
+	GetService()->ReleaseSeession(GetSessionRef());
+	//해당 코드가 Disconnect에서 실행되면
+	//브로드 캐스팅하다가 클라이언트를 갑자기꺼버리면 크래시가 난다.
+	//이유는 브로드 캐스팅을 도는 for-each문을 실행할때 session을 erase하기때문에 메모리 오염이 발생.
+	//때문에 해당 코드는 여기서 실행해야 한다.
 
 }
 
@@ -320,8 +332,6 @@ void Session::ProcessSend(int32 numOfBytes)
 	OnSend(numOfBytes);
 	
 
-	cout << "Test3" << endl;
-
 	WRITE_LOCK;
 	if (_sendQueue.empty()) // 비어져있다는건 send할 데이터를 다 send했다는 뜻이고, 아직 남아있다는 건 send할 데이터가 남아있다는 뜻.
 		_sendRegistered.store(false);
@@ -338,11 +348,54 @@ void Session::HandleError(int32 errorCode)
 	{
 	case WSAECONNRESET:
 	case WSAECONNABORTED: // 연결이 끊김.
-		Disconnect(L"HandleError");
+		Disconnect(L"HandleError"); // 연결이 끊겨서 disconnect
 		break;
 
 	default:
 		cout << "Handle Error" << endl;
 		break;
 	}
+}
+
+
+// --------------------------------------------
+
+
+PacketSession::PacketSession()
+{
+
+}
+
+
+
+PacketSession::~PacketSession()
+{
+}
+
+
+
+int32 PacketSession::OnRecv(BYTE* buffer, int32 len)
+{
+	int32 processLen = 0;
+
+	while (true)
+	{
+		int32 dataSize = len - processLen;
+		//최소한 헤더는 파싱할 수 있어야한다.
+		if (dataSize < sizeof(PacketHeader))
+			break;
+
+		PacketHeader header = *(reinterpret_cast<PacketHeader*>(&buffer[processLen]));
+		//헤더의 기록 된 패킷 크기를 파싱할 수 있어야한다.
+		if (dataSize < header.size)
+			break;
+
+		//여기까지오면 패킷 조립 성공.
+		OnRecvPacket(&buffer[processLen], header.size);
+
+		processLen += header.size;
+	}
+
+
+	return processLen;
 }

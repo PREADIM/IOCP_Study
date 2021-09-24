@@ -2,11 +2,11 @@
 
 #include "CoreMacro.h"
 #include "Container.h"
-#include "CorePch.h"
 #include "CoreTLS.h"
 #include "CoreGlobal.h"
 #include "Allocator.h"
 #include "MemoryManager.h"
+#include "TypeCast.h"
 
 
 #include <Windows.h>
@@ -23,3 +23,4 @@ using namespace std;
 #include "Lock.h"
 #include "SendBuffer.h"
 #include "ObjectPool.h"
+

@@ -184,7 +184,7 @@ public:
 	}
 
 
-	template<int32 i>
+	template<int32 j>
 	static void MakeTable(int2Type<length>, int2Type<j>) // 끝과 끝까지 다 돈것이므로 할게없음.
 	{
 	}
@@ -214,7 +214,7 @@ To TypeCast(From* ptr)
 
 	using TL = typename From::TL; // 해당하는 클래스안에 using TL이 있어야한다.
 
-	if(TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf<TL, remove_pointer_t<To>::value))
+	if(TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf<TL, remove_pointer_t<To>>::value))
 		return static_cast<To>(ptr);
 	// 또한 해당하는 클래스 안에 _typeid가 있어야 동작한다.
 
@@ -231,7 +231,7 @@ std::shared_ptr<To> TypeCast(std::shared_ptr<From> ptr)
 
 	using TL = typename From::TL; // 해당하는 클래스안에 using TL이 있어야한다.
 
-	if (TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf < TL, remove_pointer_t<To>::value))
+	if (TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf<TL, remove_pointer_t<To>>::value))
 		return static_pointer_cast<To>(ptr);
 	// 또한 해당하는 클래스 안에 _typeid가 있어야 동작한다.
 
@@ -246,7 +246,7 @@ bool CanCast(From* ptr)
 		return false;
 
 	using TL = typename From::TL; // 해당하는 클래스안에 using TL이 있어야한다.
-	return TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf < TL, remove_pointer_t<To>::value)
+	return TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf<TL, remove_pointer_t<To>>::value);
 	// 또한 해당하는 클래스 안에 _typeid가 있어야 동작한다.
 }
 
@@ -260,7 +260,7 @@ bool CanCast(std::shared_ptr<From> ptr)
 		return false;
 
 	using TL = typename From::TL; // 해당하는 클래스안에 using TL이 있어야한다.
-	return TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf < TL, remove_pointer_t<To>::value)
+	return TypeConversion<TL>::CanConvert(ptr->_typeid, IndexOf < TL, remove_pointer_t<To>>::value);
 		// 또한 해당하는 클래스 안에 _typeid가 있어야 동작한다.
 }
 #pragma endregion

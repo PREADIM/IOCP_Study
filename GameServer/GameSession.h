@@ -1,7 +1,7 @@
 #pragma once
 #include "Session.h"
 
-class GameSession : public Session
+class GameSession : public PacketSession
 	// 서버에서 생성하는 이 GameSession은 클라이언트의 Session에 데이터를 주고받고 하기위한 일종의 매표소이다.
 {
 public:
@@ -13,7 +13,7 @@ public:
 
 	virtual void OnConnected() override;
 	virtual void OnDisconnected() override;
-	virtual int32 OnRecv(BYTE* buffer, int32 len) override;
+	virtual int32 OnRecvPacket(BYTE* buffer, int32 len) override;
 	virtual void OnSend(int32 len) override;
 	
 };

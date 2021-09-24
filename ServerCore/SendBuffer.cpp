@@ -111,6 +111,8 @@ SendBufferRef SendBufferManager::Open(uint32 size)
 
 SendBufferChunkRef SendBufferManager::MRent()
 {
+	cout << "Pop SEND BUUFER CHUNK" << endl;
+
 	{
 		WRITE_LOCK;
 		if (_sendBufferChunks.empty() == false) // 센드청크 풀에 데이터가 있으면,
@@ -139,7 +141,11 @@ void SendBufferManager::MRetrun(SendBufferChunkRef buffer)
 void SendBufferManager::PushGlobal(SendBufferChunk* buffer) //static이 붙은이유는 위에.
 {
 
+	cout << "PushGlobal SEND BUUFER CHUNK" << endl;
+
 	GSendBufferManager->MRetrun(SendBufferChunkRef(buffer, PushGlobal));
 
 }
+
+
 

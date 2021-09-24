@@ -102,3 +102,28 @@ private:
 };
 
 
+
+// -----------------------------
+
+
+
+struct PacketHeader
+{
+	uint16 size; // 전체 패킷 사이즈
+	uint16 id; //  프로토콜ID
+};
+
+
+class PacketSession : public Session
+{
+public:
+	PacketSession();
+	virtual ~PacketSession();
+
+	PacketSessionRef GetPacketSessionRef() { return static_pointer_cast<PacketSession>(shared_from_this()); }
+
+
+protected:
+	virtual int32 OnRecv(BYTE* buffer, int32 len) sealed; // 못쓰게함. 봉인
+	virtual int32 OnRecvPacket(BYTE* buffer, int32 len) abstract;
+};
