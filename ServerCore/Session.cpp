@@ -205,6 +205,8 @@ void Session::RegisterSend()
 			SendBufferRef sendBuffer = _sendQueue.front();
 
 			writeSize += sendBuffer->WriteSize();
+			// TODO : 예외 체크
+
 
 			_sendQueue.pop();
 			_sendEvent._sendBuffers.push_back(sendBuffer); 

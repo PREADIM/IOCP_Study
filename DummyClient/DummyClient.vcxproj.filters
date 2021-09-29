@@ -15,10 +15,21 @@
     <ClCompile Include="DummyClientPch.cpp">
       <Filter>Utiles</Filter>
     </ClCompile>
+    <ClCompile Include="ClientPacketHandler.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DummyClientPch.h">
       <Filter>Utiles</Filter>
     </ClInclude>
+    <ClInclude Include="ClientPacketHandler.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="PDL.xml">
+      <Filter>Main</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

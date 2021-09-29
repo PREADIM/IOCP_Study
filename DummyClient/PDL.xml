@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PDL>
+  <Packet name="S_TEST" desc="테스트 용도">
+    <Feild name="id" type="uint64" desc=""/>
+    <Feild name="hp" type="uint32" desc=""/>
+    <Feild name="attack" type="uint16" desc=""/>
+    <List name="buffs", desc="">
+      <Feild name="buffs" type="uint64" desc=""/>
+      <Feild name="remainTime" type="float" desc=""/>
+    </List>   
+  </Packet>
+</PDL>

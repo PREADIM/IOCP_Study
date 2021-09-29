@@ -1,5 +1,7 @@
 ﻿  pch.cpp
   Allocator.cpp
+  BufferReader.cpp
+  BufferWriter.cpp
   CoreGlobal.cpp
   CoreMacro.cpp
   CorePch.cpp
@@ -20,6 +22,8 @@ C:\Users\sngbi\source\repos\GameServer\ServerCore\Lock.cpp(70,19): warning C4244
   SendBuffer.cpp
   Service.cpp
   Session.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
   SocketUtils.cpp
   ThreadManager.cpp
   코드를 생성하고 있습니다...

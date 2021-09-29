@@ -4,6 +4,8 @@
 #include "Session.h"
 #include "GameSession.h"
 #include "GameSessionManager.h"
+#include "BufferWriter.h"
+#include "ServerPacketHandler.h"
 
 
 
@@ -33,15 +35,8 @@ int main()
 
 	while (true)
 	{
-		SendBufferRef sendBuffer = GSendBufferManager->Open(4096);
-
-		BYTE* buffer = sendBuffer->Buffer();
-
-		((PacketHeader*)buffer)->size = (sizeof(sendData) + sizeof(PacketHeader));
-		((PacketHeader*)buffer)->id = 1;
-
-		::memcpy(&buffer[4], sendData, sizeof(sendData));
-		sendBuffer->Close((sizeof(sendData) + sizeof(PacketHeader))); // 다 사용하면 닫아주기.
+		vector<BuffsListItem> buffs{ BuffsListItem { 100, 1.5f }, BuffsListItem { 200, 2.3f }, BuffsListItem { 300, 0.7f } };
+		SendBufferRef sendBuffer = ServerPacketHandler::Make_S_TEST(1001, 100, 10, buffs);
 
 		GSessionManager.Broadcast(sendBuffer); // 모든애들한테 전달. 브로드 캐스팅
 
