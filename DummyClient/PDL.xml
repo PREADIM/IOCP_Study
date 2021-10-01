@@ -4,9 +4,13 @@
     <Feild name="id" type="uint64" desc=""/>
     <Feild name="hp" type="uint32" desc=""/>
     <Feild name="attack" type="uint16" desc=""/>
-    <List name="buffs", desc="">
+    <List name="buffs" desc="">
       <Feild name="buffs" type="uint64" desc=""/>
       <Feild name="remainTime" type="float" desc=""/>
+      <List name ="victms">
+        <Field name ="userid" type ="uint64"/>
+      </List>
+
     </List>   
   </Packet>
 </PDL>

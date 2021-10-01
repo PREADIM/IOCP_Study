@@ -18,7 +18,16 @@ void ServerPacketHandler::HandlePacket(BYTE* buffer, int32 len)
 
 }
 
-SendBufferRef ServerPacketHandler::Make_S_TEST(uint64 id, uint32 hp, uint16 attack, vector<BuffsListItem> buffs)
+
+
+
+
+
+
+
+
+
+/*SendBufferRef ServerPacketHandler::Make_S_TEST(uint64 id, uint32 hp, uint16 attack, vector<BuffsListItem> buffs)
 {
 
 	SendBufferRef sendBuffer = GSendBufferManager->Open(4096); // Open 할때 sendBuffer생성자에 필요한 owner, buffer, allocSize를 다 초기화 해줌.
@@ -49,10 +58,13 @@ SendBufferRef ServerPacketHandler::Make_S_TEST(uint64 id, uint32 hp, uint16 atta
 	}
 
 
-	header->size = bw.WriteSize(); // 헤더 저장공간을 미리 확보해두었으니 언제든지 접근가능.
+	header->size = bw.WriteSize(); // 헤더 저장공간을 미리 확보해두었으니 언제든지 접근가능. 데이터의 총 사이즈
 	header->id = S_TEST; // 1: text msg
 
 	sendBuffer->Close(bw.WriteSize()); // 다 사용하면 닫아주기.
 
 	return sendBuffer;
-}
+}*/
+
+
+

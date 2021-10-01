@@ -14,7 +14,7 @@ public:
 	bool Write(void* src, uint32 len); // 데이터 작성
 
 	template<typename T>
-	T* Reserve();
+	T* Reserve(uint16 count = 1);
 
 	/*template<typename T>
 	BufferWriter& operator<<(const T& src);*/
@@ -39,13 +39,13 @@ private:
 
 
 template<typename T>
-inline T* BufferWriter::Reserve()
+inline T* BufferWriter::Reserve(uint16 count)
 {
-	if (FreeSize() < sizeof(T))
+	if (FreeSize() < sizeof(T) *count)
 		return nullptr;
 	
 	T* ret = reinterpret_cast<T*>(&_buffer[_pos]); // 해당 공간을 주고
-	_pos += sizeof(T); // 커서 옮기기 
+	_pos += sizeof(T) * count; // 커서 옮기기 
 	return ret;
 }
 
