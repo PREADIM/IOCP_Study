@@ -1,6 +1,6 @@
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\servercore.pch
-c:\users\sngbi\source\repos\gameserver\libraries\debug\servercore.pdb
-c:\users\sngbi\source\repos\gameserver\libraries\debug\servercore.idb
+c:\users\sngbi\source\repos\gameserver\libraries\libs\servercore\debug\servercore.pdb
+c:\users\sngbi\source\repos\gameserver\libraries\libs\servercore\debug\servercore.idb
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\pch.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\session.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\service.obj
@@ -24,7 +24,7 @@ c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\bufferreader.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\allocator.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\threadmanager.obj
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\socketutils.obj
-c:\users\sngbi\source\repos\gameserver\libraries\debug\servercore.lib
+c:\users\sngbi\source\repos\gameserver\libraries\libs\servercore\debug\servercore.lib
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\servercore.tlog\cl.command.1.tlog
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\servercore.tlog\cl.read.1.tlog
 c:\users\sngbi\source\repos\gameserver\servercore\x64\debug\servercore.tlog\cl.write.1.tlog

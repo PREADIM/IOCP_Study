@@ -5,12 +5,15 @@
 #include "GameSession.h"
 #include "GameSessionManager.h"
 #include "BufferWriter.h"
-#include "ServerPacketHandler.h"
+#include "ClientPacketHandler.h"
+#include "Protocol.pb.h"
 
 
 
 int main()
 {
+	ClientPacketHandler::Init();
+
 	ServerServiceRef service = MakeShared<ServerService>(
 		NetAddress(L"127.0.0.1", 7777),
 		MakeShared<IocpCore>(),
@@ -35,46 +38,35 @@ int main()
 
 
 
-
 	while (true)
 	{
 		// [ PKT_S_TEST ]
-		PKT_S_TEST_WRITE pktWriter(1001, 100, 10);
+		Protocol::S_TEST pkt;
+		pkt.set_id(1000);
+		pkt.set_hp(100);
+		pkt.set_attack(10);
 
 
-		// [ PKT_S_TEST ][BuffsListItem BuffsListItem BuffsListItem]
-		PKT_S_TEST_WRITE::BuffsList buffList = pktWriter.ReserveBuffsList(3);
-		buffList[0] = { 100, 1.5f };
-		buffList[1] = { 200, 2.3f };
-		buffList[2] = { 300, 0.7f };
-		
-		PKT_S_TEST_WRITE::BuffsVictimsList vic0 = pktWriter.ReserveBuffsVictimsList(&buffList[0], 3); 
-		//인자로 그냥 buffList를 하면 안되고, 반드시 &buffList[0]을 해야한다.
-		//왜냐면 결국 PacketList안에 있는 컨테이너타입은 결국엔 BuffListItem 이기때문에, 
-		//[0]번째링크를 보내주어야 인자로 받는 BuffListItem*이 일치한다.
-		//[0]번째 링크를 보내주어도 어처피 PKT_S_TEST_WRITE 클래스 안에있는 BufferWriter에서 알아서 Reserve하면서 알아서 다음 커서로 메모리를 할당해준다.
+		//auto m = pkt.mutable_buffs();
+		//m->Add();
+
 
 		{
-			vic0[0] = 1000;
-			vic0[1] = 2000;
-			vic0[2] = 3000;
+			Protocol::BuffData* data = pkt.add_buffs(); // 해당 데이터 자리로 가서 인자 저장. (Reserve로 받아서 저장하는 느낌)
+			data->set_buffid(100);
+			data->set_remaintime(1.2f);
+			data->add_victims(4000);
 		}
-
-		PKT_S_TEST_WRITE::BuffsVictimsList vic1 = pktWriter.ReserveBuffsVictimsList(&buffList[1], 1);
 
 		{
-			vic1[0] = 1000;
+			Protocol::BuffData* data = pkt.add_buffs(); // 해당 데이터 자리로 가서 인자 저장. (Reserve로 받아서 저장하는 느낌)
+			data->set_buffid(200);
+			data->set_remaintime(2.5f);
+			data->add_victims(1000);
+			data->add_victims(2000);
 		}
 
-		PKT_S_TEST_WRITE::BuffsVictimsList vic2 = pktWriter.ReserveBuffsVictimsList(&buffList[2], 2);
-
-		{
-			vic2[0] = 3000;
-			vic2[1] = 5000;
-		}
-
-
-		SendBufferRef sendBuffer = pktWriter.CloseAndReturn();
+		SendBufferRef sendBuffer = ClientPacketHandler::MakeSendBuffer(pkt);
 
 		GSessionManager.Broadcast(sendBuffer); // 모든애들한테 전달. 브로드 캐스팅
 
