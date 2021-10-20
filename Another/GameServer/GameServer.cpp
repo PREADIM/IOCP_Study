@@ -161,11 +161,19 @@ int main()
 
 		wcout.imbue(locale("kor"));
 
-		while (dbConn->Fetch())
+		// 반복문이 아니더라도 계속해서 출력이 가능한 이유는 
+		// SQLBindCol을 먼저 등록한 뒤에 SQLFetch를 실행하면
+		// Fetch가 가능할때까지 BindCol된 변수에 값을 가져 올수 있는 것같다.
+		// 반드시 SQLBindCol을 먼저하고 SQLFetch가 실행되어야한다.
+		while (dbConn->Fetch()) 
 		{
 			wcout << "Id: " << outId << " Gold : " << outGold << " Name: " << outName << endl;
 			wcout << "Date : " << outDate.year << "/" << outDate.month << "/" << outDate.day << endl;
 		}
+
+		// SQLHSTMT 변수로 에서 가장 최근에 실행된 명령문이 SELECT 문인 경우에만 호출될 수 있다. (dbConnect.Execute(query))
+		// SQLBindCol()과 바인드된 애플리케이션 변수 개수는 결과 집합의 열 수를 초과해서는 안된다.
+		// 그렇지 않으면 SQLFetch()가 실패한다.
 
 		GDBConnectionPool->Push(dbConn);
 	}
