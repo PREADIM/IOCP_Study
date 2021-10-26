@@ -3,10 +3,9 @@ package Protocol;
 
 import "Enum.proto";
 
-message Player
+message BuffData
 {
-	uint64 id = 1;
-	string name = 2;
-	PlayerType playerType = 3;
-	// Ω∫≈» ¡§∫∏...
+	uint64 buffId = 1;
+	float remainTime = 2;
+	repeated uint64 victims = 3;
 }

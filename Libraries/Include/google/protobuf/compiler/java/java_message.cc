@@ -316,7 +316,6 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
   WriteMessageDocComment(printer, descriptor_);
   MaybePrintGeneratedAnnotation(context_, printer, descriptor_,
                                 /* immutable = */ true);
-
   // The builder_type stores the super type name of the nested Builder class.
   std::string builder_type;
   if (descriptor_->extension_range_count() > 0) {
@@ -1367,6 +1366,41 @@ void ImmutableMessageGenerator::GenerateInitializers(io::Printer* printer) {
   }
 }
 
+// ===================================================================
+void ImmutableMessageGenerator::GenerateMutableCopy(io::Printer* printer) {
+  printer->Print(
+      "protected com.google.protobuf.MutableMessage\n"
+      "    internalMutableDefault() {\n"
+      "  return MutableDefaultLoader.get();\n"
+      "}\n"
+      "\n"
+      "private static final class MutableDefaultLoader {\n"
+      "  private static final java.lang.Object defaultOrRuntimeException;\n"
+      "  static {\n"
+      "    java.lang.Object local;\n"
+      "    try {\n"
+      "      local = internalMutableDefault(\"$mutable_name$\");\n"
+      "    } catch (java.lang.RuntimeException e) {\n"
+      "      local = e;\n"
+      "    }\n"
+      "    defaultOrRuntimeException = local;\n"
+      "  }\n"
+      "\n"
+      "  private MutableDefaultLoader() {}\n"
+      "\n"
+      "  public static com.google.protobuf.MutableMessage get() {\n"
+      "    if (defaultOrRuntimeException\n"
+      "         instanceof java.lang.RuntimeException) {\n"
+      "      throw (java.lang.RuntimeException) defaultOrRuntimeException;\n"
+      "    }\n"
+      "    return\n"
+      "        (com.google.protobuf.MutableMessage) "
+      "defaultOrRuntimeException;\n"
+      "  }\n"
+      "}\n",
+      "mutable_name", name_resolver_->GetJavaMutableClassName(descriptor_));
+}
+
 void ImmutableMessageGenerator::GenerateKotlinDsl(io::Printer* printer) const {
   printer->Print(
       "@kotlin.OptIn"
@@ -1374,7 +1408,7 @@ void ImmutableMessageGenerator::GenerateKotlinDsl(io::Printer* printer) const {
       "@com.google.protobuf.kotlin.ProtoDslMarker\n");
   printer->Print(
       "class Dsl private constructor(\n"
-      "  @kotlin.jvm.JvmField private val _builder: $message$.Builder\n"
+      "  private val _builder: $message$.Builder\n"
       ") {\n"
       "  companion object {\n"
       "    @kotlin.jvm.JvmSynthetic\n"
@@ -1422,7 +1456,7 @@ void ImmutableMessageGenerator::GenerateKotlinMembers(
     io::Printer* printer) const {
   printer->Print(
       "@kotlin.jvm.JvmSynthetic\n"
-      "inline fun $camelcase_name$(block: $message_kt$.Dsl.() -> Unit): "
+      "inline fun $camelcase_name$(block: $message_kt$.Dsl.() -> kotlin.Unit): "
       "$message$ "
       "=\n"
       "  $message_kt$.Dsl._create($message$.newBuilder()).apply { block() "
@@ -1447,7 +1481,7 @@ void ImmutableMessageGenerator::GenerateTopLevelKotlinMembers(
     io::Printer* printer) const {
   printer->Print(
       "@kotlin.jvm.JvmSynthetic\n"
-      "inline fun $message$.copy(block: $message_kt$.Dsl.() -> Unit): "
+      "inline fun $message$.copy(block: $message_kt$.Dsl.() -> kotlin.Unit): "
       "$message$ =\n"
       "  $message_kt$.Dsl._create(this.toBuilder()).apply { block() "
       "}._build()\n",

@@ -1128,14 +1128,13 @@ TEST(RepeatedPtrField, ClearedElements) {
 
   EXPECT_EQ(field.Add(),
             original);  // Should return same string for reuse.
-
-  EXPECT_EQ(field.ReleaseLast(), original);  // We take ownership.
+  EXPECT_EQ(field.UnsafeArenaReleaseLast(), original);  // We take ownership.
   EXPECT_EQ(field.ClearedCount(), 0);
 
   EXPECT_NE(field.Add(), original);  // Should NOT return the same string.
   EXPECT_EQ(field.ClearedCount(), 0);
 
-  field.AddAllocated(original);  // Give ownership back.
+  field.UnsafeArenaAddAllocated(original);  // Give ownership back.
   EXPECT_EQ(field.ClearedCount(), 0);
   EXPECT_EQ(field.Mutable(1), original);
 
@@ -1155,7 +1154,7 @@ TEST(RepeatedPtrField, ClearedElements) {
 }
 
 // Test all code paths in AddAllocated().
-TEST(RepeatedPtrField, AddAlocated) {
+TEST(RepeatedPtrField, AddAllocated) {
   RepeatedPtrField<std::string> field;
   while (field.size() < field.Capacity()) {
     field.Add()->assign("filler");
@@ -1198,6 +1197,13 @@ TEST(RepeatedPtrField, AddAlocated) {
   // We should have discarded the cleared object.
   EXPECT_EQ(0, field.ClearedCount());
   EXPECT_EQ(qux, &field.Get(index));
+}
+
+TEST(RepeatedPtrField, AddAllocatedDifferentArena) {
+  RepeatedPtrField<TestAllTypes> field;
+  Arena arena;
+  auto* msg = Arena::CreateMessage<TestAllTypes>(&arena);
+  field.AddAllocated(msg);
 }
 
 TEST(RepeatedPtrField, MergeFrom) {
@@ -1514,7 +1520,9 @@ TEST(RepeatedPtrField, ExtractSubrange) {
           std::vector<std::string*> subject;
 
           // Create an array with "sz" elements and "extra" cleared elements.
-          RepeatedPtrField<std::string> field;
+          // Use an arena to avoid copies from debug-build stability checks.
+          Arena arena;
+          RepeatedPtrField<std::string> field(&arena);
           for (int i = 0; i < sz + extra; ++i) {
             subject.push_back(new std::string());
             field.AddAllocated(subject[i]);
@@ -1534,7 +1542,7 @@ TEST(RepeatedPtrField, ExtractSubrange) {
 
           // Were the removed elements extracted into the catcher array?
           for (int i = 0; i < num; ++i)
-            EXPECT_EQ(catcher[i], subject[start + i]);
+            EXPECT_EQ(*catcher[i], *subject[start + i]);
           EXPECT_EQ(NULL, catcher[num]);
 
           // Does the resulting array contain the right values?
@@ -2107,39 +2115,35 @@ TEST_F(RepeatedFieldInsertionIteratorsTest,
 TEST_F(RepeatedFieldInsertionIteratorsTest,
        UnsafeArenaAllocatedRepeatedPtrFieldWithStringIntData) {
   std::vector<Nested*> data;
-  TestAllTypes goldenproto;
+  Arena arena;
+  auto* goldenproto = Arena::CreateMessage<TestAllTypes>(&arena);
   for (int i = 0; i < 10; ++i) {
-    Nested* new_data = new Nested;
+    auto* new_data = goldenproto->add_repeated_nested_message();
     new_data->set_bb(i);
     data.push_back(new_data);
-
-    new_data = goldenproto.add_repeated_nested_message();
-    new_data->set_bb(i);
   }
-  TestAllTypes testproto;
+  auto* testproto = Arena::CreateMessage<TestAllTypes>(&arena);
   std::copy(data.begin(), data.end(),
             UnsafeArenaAllocatedRepeatedPtrFieldBackInserter(
-                testproto.mutable_repeated_nested_message()));
-  EXPECT_EQ(testproto.DebugString(), goldenproto.DebugString());
+                testproto->mutable_repeated_nested_message()));
+  EXPECT_EQ(testproto->DebugString(), goldenproto->DebugString());
 }
 
 TEST_F(RepeatedFieldInsertionIteratorsTest,
        UnsafeArenaAllocatedRepeatedPtrFieldWithString) {
   std::vector<std::string*> data;
-  TestAllTypes goldenproto;
+  Arena arena;
+  auto* goldenproto = Arena::CreateMessage<TestAllTypes>(&arena);
   for (int i = 0; i < 10; ++i) {
-    std::string* new_data = new std::string;
+    auto* new_data = goldenproto->add_repeated_string();
     *new_data = "name-" + StrCat(i);
     data.push_back(new_data);
-
-    new_data = goldenproto.add_repeated_string();
-    *new_data = "name-" + StrCat(i);
   }
-  TestAllTypes testproto;
+  auto* testproto = Arena::CreateMessage<TestAllTypes>(&arena);
   std::copy(data.begin(), data.end(),
             UnsafeArenaAllocatedRepeatedPtrFieldBackInserter(
-                testproto.mutable_repeated_string()));
-  EXPECT_EQ(testproto.DebugString(), goldenproto.DebugString());
+                testproto->mutable_repeated_string()));
+  EXPECT_EQ(testproto->DebugString(), goldenproto->DebugString());
 }
 
 TEST_F(RepeatedFieldInsertionIteratorsTest, MoveStrings) {
